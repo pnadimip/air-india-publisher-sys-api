@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<flow name="flight-vistara-topic-publisher-flow" doc:id="57676348-a386-4182-a5c7-bbeea4356146">
+		<logger level="INFO" doc:name="Start Logger" doc:id="378dd90e-b50e-4a6e-9be7-4a1e23b0b241" message="Vistara #[app.name] air lines pub flow #[payload]" />
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="40920c4a-ceb8-45e3-a47f-1f3b01d9938c" >
+			<jms:publish doc:name="T.VISTARA.FLY topic" doc:id="6452b385-53fa-4d1e-b44d-343a41ca384f" config-ref="JMS_Config" destination="${vistara.topic.name}" destinationType="TOPIC" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="972aef25-e148-4fc4-9d1f-181077196cfb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"message": payload.flightName ++ " published into T.VISTARA.FLY"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="ccc7bf1f-beab-41e3-af00-21e4aa984b5f" message="Response srilankan air lines publish is #[payload]" />
+		<error-handler ref="global-error-handlerError_Handler" />
+	
+</flow>
+
+</mule>

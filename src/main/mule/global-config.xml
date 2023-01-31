@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="air-india-publisher-sys-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" connectionIdleTimeout="180000">
+		</http:listener-connection>
+    </http:listener-config>
+    <apikit:config name="air-india-publisher-sys-api-config" api="air-india-publisher-sys-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="c6c6051c-b99a-4065-9f17-d9a99f9bd386" >
+		<jms:active-mq-connection username="${jms.username}" password="${jms.password}">
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="7d158e67-e7a9-48f3-a29a-693ad0a67bb1" file="properties\air-india-publilsher-sys-api.properties" />
+</mule>

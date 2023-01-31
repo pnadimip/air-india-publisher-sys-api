@@ -1,0 +1,10 @@
+{
+									"flightName" : "ABC",
+									"flightDate" : "12-12-2022",
+									"airLines" : "AIR INDIGO",
+									"from" : "Hyd",
+									"to": "Bang",
+									"fare": 1500,
+									"departure" : "10:15:00",
+									"arrival" : "11:20:00"
+											}

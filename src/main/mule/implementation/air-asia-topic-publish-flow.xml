@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="f938c9ee-7fc4-43d8-8685-41a79fbebb0f" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="flight-air-asia-topic-publisher-flow" doc:id="4983e27a-c453-4094-9017-4122799d6b17" >
+		<logger level="INFO" doc:name="Start Logger" doc:id="fbea0a7f-e94b-403e-8379-b6108d621940" message="app name  is #[app.name]  Air ASIA  air lines pub flow #[payload]"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="aa38667d-ef2a-4ec6-8312-fc8c5e474b7b" >
+			<jms:publish doc:name="T.AIRASIA.FLY topic" doc:id="c4dfdee0-2a9d-42cd-ab97-dda70e47f5c1" config-ref="JMS_Config" destination="${airasia.topic.name}" destinationType="TOPIC" persistentDelivery="true" priority="1" timeToLive="5" timeToLiveUnit="HOURS" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="44f168df-898a-4d99-b697-3e5254d1ce56" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"message": payload.flightName ++ " published into T.AIRASIA.FLY"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="94e3db82-fad6-48d4-aaa1-61aab57c0387" message="Response AIR ASIA air lines publish is #[payload]"/>
+		<error-handler ref="global-error-handlerError_Handler" />
+	
+</flow>
+
+</mule>

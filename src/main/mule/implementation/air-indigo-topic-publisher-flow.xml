@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="flight-indigo-topic-publisher-flow" doc:id="450858da-5936-4f0c-a029-9dc21ec83462" >
+		<logger level="INFO" doc:name="Start Logger" doc:id="5dbf2021-7910-412c-81e7-1f1a4fe0c85d" message="app name #[app.name] Input request of the payload is #[payload]   correlation Id is : #[vars.correlationID]"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="eed3b6bf-df68-4e5a-8728-428b77803f4d" >
+			<jms:publish doc:name="T.AIRINDIGO.FLY topic" doc:id="a9475eae-d360-4675-b3fd-48bece90675d" config-ref="JMS_Config" destination="${airindigo.topic.name}" destinationType="TOPIC" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="185ecc86-fc6d-490f-a33c-0f5cd43a4274" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"message": payload.flightName ++ " published into T.AIRINDIGO.FLY"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="9ed6f16b-35cb-4bbd-ae12-9baffcdffd37" message="#[app.name]Flight published message is #[payload]  correlatio id is #[vars.correlationID]"/>
+		<error-handler ref="global-error-handlerError_Handler">
+			
+		</error-handler>
+	
+</flow>
+</mule>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="flight-srilankan-topic-publisher-flow" doc:id="d16589a4-98f8-4aeb-9d30-b204641720c8" >
+		<logger level="INFO" doc:name="Start Logger" doc:id="ccfbbcd4-01bf-4b43-b57a-a7f9d7f86187" message="app name #[app.name] Srilankan air lines pub flow #[payload]"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="60de17e2-3aa9-4dae-a5c7-fedd6c153332" >
+			<jms:publish doc:name="T.SRILANKAN.FLY topic" doc:id="334e116f-b79d-4cc3-b4d0-7154cb26a4d6" config-ref="JMS_Config" destination="${srilankan.topic.name}" destinationType="TOPIC" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="c8c6dd8f-d182-405b-87aa-f2ae287b4821" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"message": payload.flightName ++ " published into T.AIRINDIGO.FLY"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="e9f093c7-7580-484d-8020-fcacc8588dc6" message="Response srilankan air lines publish is #[payload]"/>
+		<error-handler ref="global-error-handlerError_Handler" />
+	
+</flow>
+</mule>

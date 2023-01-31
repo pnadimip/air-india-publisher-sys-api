@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="air-india-publisher-sys-api-main">
+        <http:listener config-ref="air-india-publisher-sys-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[attributes.headers.correlationId default correlationId]" doc:name="correlation id" doc:id="b27c84c7-c50a-4051-bc0d-d3094f5d2d7f" variableName="correlationID"/>
+		<apikit:router config-ref="air-india-publisher-sys-api-config" />
+        <error-handler ref="api-kit-global-error-handlerError_Handler">
+            
+        </error-handler>
+    </flow>
+    <flow name="air-india-publisher-sys-api-console">
+        <http:listener config-ref="air-india-publisher-sys-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="air-india-publisher-sys-api-config" />
+		<error-handler ref="api-kit-global-error-handlerError_Handler" />
+    </flow>
+    <flow name="post:\airAsiaFLights:application\json:air-india-publisher-sys-api-config">
+        <flow-ref doc:name="air asia publisher flow call" doc:id="3bd1e0a0-0f78-4f4d-91a3-d8f18456ef7b" name="flight-air-asia-topic-publisher-flow" />
+    </flow>
+    <flow name="post:\airIndigoFLights:application\json:air-india-publisher-sys-api-config">
+        <flow-ref doc:name="air indigo publisher flow call" doc:id="5c7a2031-3f2f-4408-ab85-bccdde32b2d4" name="flight-indigo-topic-publisher-flow" />
+    </flow>
+    <flow name="post:\srilankanFLights:application\json:air-india-publisher-sys-api-config">
+        <flow-ref doc:name="srilankan publisher flow call" doc:id="4756e050-98a9-4f5a-b7be-96aff377d638" name="flight-srilankan-topic-publisher-flow" />
+    </flow>
+    <flow name="post:\vistaraFLights:application\json:air-india-publisher-sys-api-config">
+        <flow-ref doc:name="Vistara publisher flow call" doc:id="e38226e0-24be-4022-a522-76da9a0a3c16" name="flight-vistara-topic-publisher-flow" />
+    </flow>
+</mule>
